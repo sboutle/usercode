@@ -287,14 +287,9 @@ MyPlot::MyPlot(string plotname){
 
 void PrintMessage(){
 
-  std::cout << "hello world" << std::endl;
-
-
 }
 
 TFile* openTheFiles(int lepSelection){
-
-  std::cout << "hello world" << std::endl;
 
   TString lepType = "";
   if( lepSelection==0 )      lepType = "mu_sel";
@@ -377,8 +372,6 @@ void MyPlot::drawShapeComparison(vector<string> samplesToCompare){
 
 void MyPlot::drawStack(bool drawData, bool setLog, bool drawLegend){
 
-  cout << "drawing..." << endl;
-  
   char *countsname = new char[200];
   char *sumname = new char[200];
 
@@ -386,7 +379,6 @@ void MyPlot::drawStack(bool drawData, bool setLog, bool drawLegend){
   int first_bin = 0;
   int last_bin  = nbins+1;
 
-  cout << this->h_data->Integral() << endl;
 
   // GET TOTAL ERROR FOR YIELDS PRINTOUT (TAKE LARGEST, NOT AVERAGE)
 

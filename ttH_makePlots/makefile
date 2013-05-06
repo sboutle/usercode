@@ -4,7 +4,7 @@ LD            = g++
 all: runit
 
 runit: test.o 
-	$(LD) -g plotMaker.o -o runit `root-config --libs --cflags`
+	$(LD) -g plotMaker.o -o makePlots `root-config --libs --cflags`
 
 test.o: plotMaker.C plotMaker.h
 	$(LD) -I `root-config --incdir` -c plotMaker.C  `root-config --libs --cflags`
