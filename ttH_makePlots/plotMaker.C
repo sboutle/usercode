@@ -39,7 +39,7 @@
 using namespace std;
 int main(){
 
-  bool drawAnalysisPlots = false;
+  bool drawAnalysisPlots = true;
 
   bool drawData = true;
   bool drawLog = true;
@@ -55,7 +55,7 @@ int main(){
   std::cout << "Open the files...." << std::endl;
   openTheFiles(lepSel);
 
-  //Choose which categories you would like to make plots for
+  // Choose which categories you would like to make plots for
 
   std::vector<std::string> cat_labels;
   cat_labels.clear();
@@ -72,6 +72,7 @@ int main(){
   int NumCat = int(cat_labels.size());
 
   // Set up the output directories
+
   std::string dirprefix = "Images/";
   struct stat st;
   if( stat(dirprefix.c_str(),&st) != 0 )  mkdir(dirprefix.c_str(),0777);
@@ -81,73 +82,9 @@ int main(){
     if( stat(temp.c_str(),&st) != 0 )  mkdir(temp.c_str(),0777);
   }
   
-
   //EXAMPLE: MyPlot *numJets = new MyPlot("h_numJet_ge2tag");
-  //EXAMPLE: numJets->setPlotMax(100000.);
+  //EXAMPLE: numJets->setPlotMax(100000.); \\ This is optional
   //EXAMPLE: numJets->drawStack(drawData,setLog,drawLegend);
-
-
-  if(drawAnalysisPlots==false){
-
-
-
-    //MyPlot *numJets = new MyPlot("h_numJet_ge2tag");
-    //MyPlot *numTags = new MyPlot("h_numTag_full");
-   
-    //numJets->drawStack(noData,drawLog,noLegend);
-    //numTags->drawStack(drawData,drawLog,noLegend);
-    //numTags->drawStack(noData,drawLog,noLegend);
-
-    vector<string> samplesForComparison;
-    //samplesForComparison.push_back("data");
-    samplesForComparison.push_back("ttbb");
-    //samplesForComparison.push_back("ttcc");
-    //samplesForComparison.push_back("ttlf");
-    //samplesForComparison.push_back("ttV");
-    //samplesForComparison.push_back("ewk");
-    samplesForComparison.push_back("ttH");
-    
-    MyPlot *jetcsv_compare = new MyPlot("h_jet_csv_4j2t");
-    jetcsv_compare->drawShapeComparison(samplesForComparison);
-    //jetcsv_compare->drawStack(drawData,noLog,noLegend);
-    //jetcsv_compare->drawStack(drawData,drawLog,noLegend);
-
-    delete jetcsv_compare;
-
-    MyPlot *jetcsv_compare2 = new MyPlot("h_jet_csv_4j2t");
-    //jetcsv_compare2->drawShapeComparison(samplesForComparison);
-    jetcsv_compare2->drawStack(drawData,noLog,noLegend);
-    
-  
-    vector<string> histoNamesToDraw;
-    histoNamesToDraw.push_back("h_jet_csv");
-    //histoNamesToDraw.push_back("h_tag_csv");
-    vector<string> histoNamesToDrawTrue;
-    histoNamesToDrawTrue.push_back("h_tag_csvB");
-    histoNamesToDrawTrue.push_back("h_jet_csvB");
-    histoNamesToDrawTrue.push_back("h_jet_flavour");
-    histoNamesToDrawTrue.push_back("h_tag_flavour");
-    histoNamesToDrawTrue.push_back("h_untag_flavour");
-
-
-   vector<MyPlot> histosToDraw;
-    
-    for(int i= 0; i<NumCat;i++){
-      for(int k = 0; k<int(histoNamesToDraw.size()); k++){
-	//string histname = histoNamesToDraw[k]+"_"+cat_labels[i];
-	//MyPlot *plotInCategories = new MyPlot(histname);
-	//plotInCategories->drawStack(drawData,noLog,drawLegend);
-
-      }
-      for(int k = 0; k<int(histoNamesToDrawTrue.size()); k++){
-	string histnametrue = histoNamesToDrawTrue[k]+"_"+cat_labels[i];
-	//MyPlot *plotInCategoriesTrue = new MyPlot(histnametrue);
-	//plotInCategoriesTrue->drawStack(noData,noLog,drawLegend);
-      }
-    }
-  }
-  
-
 
   if(drawAnalysisPlots){
 
@@ -193,11 +130,52 @@ int main(){
       string histname = "h_disc_final10v1_8TeV_CFMlpANN_"+cat_labels[i];
       MyPlot *plotOutCategories = new MyPlot(histname);
       plotOutCategories->drawStack(drawData,noLog,drawLegend);
-    }
-    
-    
+    } 
   }
-  
+
+
+  if(drawAnalysisPlots==false){
+
+    MyPlot *numJets = new MyPlot("h_numJet_ge2tag");
+    MyPlot *numTags = new MyPlot("h_numTag_full");
+   
+    numJets->drawStack(drawData,drawLog,noLegend);
+    numTags->drawStack(drawData,drawLog,noLegend);
+
+    vector<string> samplesForComparison;
+    //samplesForComparison.push_back("data");
+    samplesForComparison.push_back("ttbb");
+    //samplesForComparison.push_back("ttcc");
+    //samplesForComparison.push_back("ttlf");
+    //samplesForComparison.push_back("ttV");
+    //samplesForComparison.push_back("ewk");
+    samplesForComparison.push_back("ttH");
+    
+    MyPlot *jetcsv_compare = new MyPlot("h_jet_csv_4j2t");
+    jetcsv_compare->drawShapeComparison(samplesForComparison);
+
+    vector<string> histoNamesToDraw;
+    histoNamesToDraw.push_back("h_jet_csv");
+    histoNamesToDraw.push_back("h_tag_csv");
+    vector<string> histoNamesToDrawTrue;
+    histoNamesToDrawTrue.push_back("h_tag_csvB");
+    histoNamesToDrawTrue.push_back("h_jet_csvB");
+    histoNamesToDrawTrue.push_back("h_jet_flavour");
+    histoNamesToDrawTrue.push_back("h_tag_flavour");
+    histoNamesToDrawTrue.push_back("h_untag_flavour");
+
+
+   vector<MyPlot> histosToDraw;
+    
+    for(int i= 0; i<NumCat;i++){
+      for(int k = 0; k<int(histoNamesToDraw.size()); k++){
+	string histname = histoNamesToDraw[k]+"_"+cat_labels[i];
+	MyPlot *plotInCategories = new MyPlot(histname);
+	plotInCategories->drawStack(drawData,noLog,drawLegend);
+      }
+    }
+  }
+    
   closeTheFiles();
  
   PrintMessage();

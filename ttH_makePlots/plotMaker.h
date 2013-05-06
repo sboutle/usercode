@@ -43,6 +43,9 @@ double rate_err_ttbb = 0.5;
 double frac_rate_err_ttbb_2 = rate_err_ttbb * rate_err_ttbb;
 int lepSel = 2;
 const double alpha = 1 - 0.6827;
+
+// Here set the location of your input histogram files:
+
 TString baseDir = "/data2/ttH/";
 TString basePrefix = "Trees_withoutCVSreshape4/histos/yggdrasil_treeReader_53x_newCSV_v14_3rd40_topPtWgt_using_v7_trees";
 
@@ -68,18 +71,17 @@ class MyPlot{
 public:
   MyPlot();
   MyPlot(string);
-  //~MyPlot();
   string plotName;
   double plotYMax;
   std::vector<std::string> sys_cat_labels;
   TH1D *TotalBKG_rateUnc;                   // Total BKG with bin-by-bin systematic uncertainties (eg. PDF)
   TH1D *h_bkg_mc_stat;                      // Total BKG with statistical uncertainty only
   TH1D *h_bkg_err_1sig;                     // Total BKG with Stat+Sys error (hatched band)
-  vector<TH1D*> h_sum_bkg_sys;              // Individual systematic uncertainties (samples combined
+  vector<TH1D*> h_sum_bkg_sys;              // Individual systematic uncertainties (samples combined)
   TH1D *h_dataMC_ratio;                     // Ratio histogram
   TH1D *h_dataMC_ratio_1sig;                // Ratio error band (green band)
-  TGraphAsymmErrors *asymmRatio;                // Ratio with asymmetric errors
-  TGraphAsymmErrors * g;
+  TGraphAsymmErrors *asymmRatio;            // Ratio with asymmetric errors
+  TGraphAsymmErrors * g;                    // Asymmetric errors for data
 
   TH1D *h_ewk;
   TH1D *h_ttbar_bbbar;
@@ -152,22 +154,15 @@ MyPlot::MyPlot(string plotname){
 
   // FILL SOME TH1D OBJECTS
 
-  //TH1D* hist_sys_temp[Nsample_all][NumSysCat];
   TH1D* hist_sys[Nsample_all][NumSysCat];
 
   for( int j=0; j<Nsample_all; j++ ){
-    //for( int b=0; b<1; b++ ){
     for( int b=0; b<NumSysCat; b++ ){
-      //hist_sys[j][b]->Reset();
       string tempname = this->plotName;
       if( b!=0 ) tempname += sys_cat_labels[b];
       TH1D* hist_sys_temp = (TH1D*)myFiles[j]->Get(tempname.c_str());
       hist_sys[j][b] = (TH1D*)hist_sys_temp->Clone("temp");
-      //hist_sys[j][b] = (TH1D*)myFiles[j]->Get(tempname.c_str());
-      //cout << "sample: " << j << " name " << allSamples[j].sampleName << endl; 
-      //cout << "before rebin histo: " << this->plotName << " bins " << hist_sys[j][b]->GetNbinsX() << endl;
       hist_sys[j][b]->Rebin(this->getRebin(tempname));
-      //cout << "after rebin histo: " << this->plotName << " bins " << hist_sys[j][b]->GetNbinsX() << endl;
     }
   }
   
@@ -1339,8 +1334,6 @@ void MySample::set_up(int lepSelection, int index){
   if(index==28) this->sampleName = "TTJetsBB_SemiLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==29) this->sampleName = "TTJetsBB_FullLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==30) this->sampleName = "TTH_Inclusive_M_125_8TeV_53xOn53x";
-  //if(index==29) this->sampleName = "";
-  //if(index==30) this->sampleName = "";
 
   if(index==0){
     if( lepSelection==0 )       this->sampleName  = "SingleMu_2012ABCD_BEAN_53xOn53x";
@@ -1379,8 +1372,6 @@ void MySample::set_up(int lepSelection, int index){
   if(index==28) this->QCDscale_unc = 19.5/157.5; //"TTJetsBB_SemiLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==29) this->QCDscale_unc = 19.5/157.5; //"TTJetsBB_FullLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==30) this->QCDscale_unc = 0.; //TTH_Inclusive_M_125_8TeV_53xOn53x";
-  //if(index==29) this->QCDscale_unc = 0.;
-  //if(index==30) this->QCDscale_unc = 0.;
 
   if(index==0) this->PDF_unc  = 0; //"SingleMu_2012ABCD_BEAN_53xOn53x";
   if(index==1) this->PDF_unc  = 128./3048; //"DYJetsToLL_M10To50_TuneZ2Star_8TeV_madgraph_Summer12_53xOn53x";
@@ -1413,8 +1404,6 @@ void MySample::set_up(int lepSelection, int index){
   if(index==28) this->PDF_unc = 14.7/157.5; //"TTJetsBB_SemiLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==29) this->PDF_unc = 14.7/157.5; //"TTJetsBB_FullLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==30) this->PDF_unc = 0.; //"TTH_Inclusive_M_125_8TeV_53xOn53x";
-  //if(index==29) this->PDF_unc = 0.;
-  //if(index==30) this->PDF_unc = 0.;
 
   if(index==0) this->sampleColor  = kBlack; //"SingleMu_2012ABCD_BEAN_53xOn53x";
   if(index==1) this->sampleColor  = kAzure+2; //"DYJetsToLL_M10To50_TuneZ2Star_8TeV_madgraph_Summer12_53xOn53x";
@@ -1447,8 +1436,6 @@ void MySample::set_up(int lepSelection, int index){
   if(index==28) this->sampleColor = kRed+3; //"TTJetsBB_SemiLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==29) this->sampleColor = kRed+3; //"TTJetsBB_FullLeptMGDecays_TuneZ2star_8TeV_madgraph_Summer12_53xOn53x";
   if(index==30) this->sampleColor = kBlue; //"TTH_Inclusive_M_125_8TeV_53xOn53x";
-  //if(index==29) this->sampleColor = kWhite;
-  //if(index==30) this->sampleColor = kWhite;
 
   if(index==0) this->process = "data";
   if(index==1) this->process = "EWK";
@@ -1481,10 +1468,6 @@ void MySample::set_up(int lepSelection, int index){
   if(index==28) this->process = "TTBB";
   if(index==29) this->process = "TTBB";
   if(index==30) this->process = "signal";
-  //if(index==29) this->process = "";
-  //if(index==30) this->process = "";
-    
- 
 
 }
 
@@ -1493,20 +1476,3 @@ void MySample::combine(){
 
 
 }
-
-//MyPlot::~MyPlot(){
-
-//delete TotalBKG_rateUnc;                   // Total BKG with bin-by-bin systematic uncertainties (eg. PDF)
-//delete h_bkg_mc_stat;                      // Total BKG with statistical uncertainty only
-//delete h_bkg_err_1sig;                     // Total BKG with Stat+Sys error (hatched band)
-  //delete h_sum_bkg_sys;                      // Individual systematic uncertainties (samples combined)  
-  //delete h_ewk;
-  //delete h_ttbar_bbbar;
-  //delete h_ttbar_ccbar;
-  //delete h_ttbar_lf;
-  //delete h_singlet;
-  //delete h_ttV;
-  //delete h_data;
-  //delete h_ttH;
-  
-//}
