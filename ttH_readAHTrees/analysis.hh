@@ -50,6 +50,7 @@ private:
   TH1F*              h_T1_chiSq;
   TH1F*              h_T2_chiSq;
   TH1F*              h_TOT_chiSq;
+  TH1F*              h_allcombo_chiSq;
 
 
   TH1F*              h_jet_genID;

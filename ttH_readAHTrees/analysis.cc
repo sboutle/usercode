@@ -26,7 +26,7 @@ int main()
 
   //TFile *f = new TFile("yggdrasil_treeMaker_v3_mc_TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_Summer12_53xOn52x_mu_sel_1.root");
   //TFile *f = new TFile("yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job1of1.root");
-  //TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job1of5.root";
+  //TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job*of5.root";
   TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTH_Inclusive_M_125_8TeV_53xOn53x_job1of1.root";
   //TString f1 = "/data2/ttH/allHad_trees/TTJets_100eventtest.root";
   TString tree2 = "worldTree";
@@ -42,6 +42,9 @@ int main()
 }
 
 void SimpleAnalysis::Loop(TTree *t1){
+
+  bool isLinear = false;
+
 
   // Initialise histograms
 
@@ -66,7 +69,8 @@ void SimpleAnalysis::Loop(TTree *t1){
   h_W2_chiSq = new TH1F("W2 chisq", "W2 chisq", 100, 0.0, 50.0);
   h_T1_chiSq = new TH1F("T1 chisq", "T1 chisq", 100, 0.0, 50.0);
   h_T2_chiSq = new TH1F("T2 chisq", "T2 chisq", 100, 0.0, 50.0);
-  h_TOT_chiSq = new TH1F("TOT chisq", "TOT chisq", 100, 0.0, 50.0);
+  h_TOT_chiSq = new TH1F("TOT chisq", "TOT chisq", 100, 0.0, 200.0);
+  h_allcombo_chiSq = new TH1F("all possible chisq", "all possible chisq", 100, 0.0, 2000.0);
 
   h_jet_genID = new TH1F("Jet genID", "Jet genID", 101, -50.5, 50.5);
   h_jet_genMotherID = new TH1F("Jet genMotherID", "Jet genMotherID", 101, -50.5, 50.5);
@@ -173,7 +177,7 @@ void SimpleAnalysis::Loop(TTree *t1){
   int WProb_counter = 0;
 
   for (Int_t i=0; i<nentries; i++) {    
-    //for (Int_t i=0; i<100; i++) {    
+  //for (Int_t i=0; i<300000; i++) {    
     t1->GetEntry(i);   
 
     int njets = 0;    
@@ -186,7 +190,7 @@ void SimpleAnalysis::Loop(TTree *t1){
     vector<vector<double> > jesUpJets = eve_->thejets_[11];
     vector<vector<double> > jesDownJets = eve_->thejets_[12];
 
-   vector<double> myDetBTagDiscr   = eve_->CSVdisc_[0];          // B-tag discriminant value with jet index the same as "thejets"
+    vector<double> myDetBTagDiscr   = eve_->CSVdisc_[0];          // B-tag discriminant value with jet index the same as "thejets"
     vector<int> jet_partonID        = eve_->jet_genId_[0];          // B-tag discriminant value with jet index the same as "thejets"
     vector<int> jet_motherID        = eve_->jet_genParentId_[0];          // B-tag discriminant value with jet index the same as "thejets"
     vector<int> flavours            = eve_->jetflavourmatch_[0];  // Flavour of generator parton matched to jet with jet index the same as "thejets"
@@ -259,7 +263,7 @@ void SimpleAnalysis::Loop(TTree *t1){
       int jetindex = it - detJets.begin(); // Get index for current jet
       TLorentzVector myDetJet=*it; 
 
-      if ((myDetJet.Pt()>55) || (myDetJet.Pt()>30 && njets>3)){
+      if ((myDetJet.Pt()>55) || (myDetJet.Pt()>25 && njets>3)){
 	njets++; 
 	h_jets_pt->Fill(myDetJet.Pt());
 
@@ -291,7 +295,7 @@ void SimpleAnalysis::Loop(TTree *t1){
     vector<TLorentzVector>::iterator it4 =detJets.begin();    
     vector<TLorentzVector>::iterator it5 =detJets.begin();    
     vector<TLorentzVector>::iterator it6 =detJets.begin();    
-    
+
     if(njets==8 && ntags>=4){
       h_avecsv_tagged->Fill(sum_discr_tagged/ntags);
       h_avecsv_untagged->Fill(sum_discr_untagged/(njets-ntags));
@@ -303,236 +307,359 @@ void SimpleAnalysis::Loop(TTree *t1){
 
 
 
-      double hadW1_chi2 = 9998.;
-      double hadW2_chi2 = 9999.;
-      TLorentzVector hadW1 = 9999.;
-      TLorentzVector hadW2 = 9999.;
-      TLorentzVector hadW1_JESUp = 9999.;
-      TLorentzVector hadW2_JESUp = 9999.;
-      TLorentzVector hadW1_JESDown = 9999.;
-      TLorentzVector hadW2_JESDown = 9999.;
-
-      int W1J1 = 99.;
-      int W1J2 = 99.;
-      int W2J1 = 99.;
-      int W2J2 = 99.;
+      if(isLinear==false){
 
 
-      
-      for(; it2!=detJets.end(); ++it2){
-	int jetindex2 = it2 - detJets.begin(); // Get index for current jet
 
-	TLorentzVector myDetJet2=*it2;
-	TLorentzVector JESUpJet2= JESUpJets[jetindex2];
-	TLorentzVector JESDownJet2= JESDownJets[jetindex2];
-	
-	if ((myDetJet2.Pt()>55) || (myDetJet2.Pt()>30 && njets>3)){
-	  int nhigher = 0;
-	  for(int jtag=0; jtag<njets && jtag<10;jtag++){
-	    if(myDetBTagDiscr[jetindex2]<myDetBTagDiscr[jtag])
-	      nhigher++;
-	  }
-	  btag_order.push_back(nhigher);
-
+	for(; it2!=detJets.end(); ++it2){
+	  int jetindex2 = it2 - detJets.begin(); // Get index for current jet 
+	  TLorentzVector myDetJet2=*it2;
 	  for(it3 = it2+1; it3!=detJets.end(); ++it3){
 	    int jetindex3 = it3 - detJets.begin(); // Get index for current jet
-
-	    TLorentzVector myDetJet3=*it3;
-	    TLorentzVector JESUpJet3= JESUpJets[jetindex3];
-	    TLorentzVector JESDownJet3= JESDownJets[jetindex3];
 	    
-	    
-	    if ((myDetJet3.Pt()>55) || (myDetJet3.Pt()>30 && njets>3)){
+	  }
+	}
+	
+	int combo_counter = 0;
+	double chisq = 9998.;
+	TLorentzVector hadW1 = 9999.;
+	TLorentzVector hadW2 = 9999.;
+	TLorentzVector Top1 = 9999.;
+	TLorentzVector Top2 = 9999.;
+	TLorentzVector leftover1 = 9999.;
+	TLorentzVector leftover2 = 9999.;
+	
 
-	      if(jetindex2>njets || jetindex3>njets) cout << "TOO MANY JET ITERATIONS" << endl;
-
-	      TLorentzVector hadW1_temp = myDetJet2+myDetJet3;
-	      TLorentzVector hadW1_JESUp_temp = JESUpJet2+JESUpJet3;
-	      TLorentzVector hadW1_JESDown_temp = JESDownJet2+JESDownJet3;
-
-	      double dijetM_UpDiff = fabs(hadW1_JESUp_temp.M() - hadW1_temp.M());
-	      double dijetM_DownDiff = fabs(hadW1_JESDown_temp.M() - hadW1_temp.M());
-	      double dijetM_unc = TMath::Max(dijetM_UpDiff,dijetM_DownDiff);
-
-	      double hadW1_chi2_temp = fabs(hadW1_temp.M()-80.1)/dijetM_unc; 
-
-	      //cout << "i = " << jetindex2 << " j = " << jetindex3 << " mass = " <<  dijetM << " chisq = " << chi2_hadW << endl;
-
-	      //cout << "dijetM_secondlowestchi2 " << dijetM_secondlowestchi2 << " dijetM_lowestchi2 " << dijetM_lowestchi2 << endl; 	      
-	      //cout << "secondlowestchi2 " << secondlowestchi2 << " lowestchi2 " << lowestchi2 << endl;
+	for(int i = 0; i < 8; i++){
+	  for(int j = i+1; j<8; j++){
+	    if(i != j){
+	      //cout << "i " << i << " j " << j << endl;
+	      bool foundk = false;
 	      
-	      if(hadW1_chi2_temp < hadW1_chi2){
-		hadW1 = hadW1_temp;
-		hadW1_JESUp = hadW1_JESUp_temp;
-		hadW1_JESDown = hadW1_JESDown_temp;
-		hadW1_chi2 = hadW1_chi2_temp;
-		W1J1 = jetindex2;
-		W1J2 = jetindex3;
+	      for(int k = 0; k<8; k++){
+		if(k!=i && k!=j && foundk==false){
+		  foundk = true;
+
+		  for(int l = k+1; l<8; l++ ){
+		    if(l!=i && l!=j){
+		      for(int m = l+1; m<8; m++){
+			if(m!=i && m!=j){
+			  for(int n=0; n<8; n++){
+			    if(n!=i && n!=j && n!=k && n!=l && n!=m){
+			      for(int o=n+1; o<8; o++){
+				if(o!=i && o!=j && o!=k && o!=l && o!=m){
+				  for(int p=o+1; p<8; p++){
+				    if(p!=i && p!=j && p!=k && p!=l && p!=m){
+				      for(int s = 0; s<9; s++){
+				     
+					int j1 = 99;
+					int j2 = 99;
+					int j3 = 99;
+					int j4 = 99;
+					int j5 = 99;
+					int j6 = 99;
+
+					if(s==0) { j1 = k; j2 = l; j3 = m; j4 = n; j5 = o; j6 = p;}
+					if(s==1) { j1 = k; j2 = l; j3 = m; j4 = o; j5 = p; j6 = n;}
+					if(s==2) { j1 = k; j2 = l; j3 = m; j4 = p; j5 = n; j6 = o;}
+					if(s==3) { j1 = l; j2 = m; j3 = k; j4 = n; j5 = o; j6 = p;}
+					if(s==4) { j1 = l; j2 = m; j3 = k; j4 = o; j5 = p; j6 = n;}
+					if(s==5) { j1 = l; j2 = m; j3 = k; j4 = p; j5 = n; j6 = o;}
+					if(s==6) { j1 = m; j2 = k; j3 = l; j4 = n; j5 = o; j6 = p;}
+					if(s==7) { j1 = m; j2 = k; j3 = l; j4 = o; j5 = p; j6 = n;}
+					if(s==8) { j1 = m; j2 = k; j3 = l; j4 = p; j5 = n; j6 = o;}
+				      
+					double chisqW1 = ((detJets[j1]+detJets[j2]).M()-80.1)*((detJets[j1]+detJets[j2]).M()-80.1)/100.;
+					double chisqW2 = ((detJets[j4]+detJets[j5]).M()-80.1)*((detJets[j4]+detJets[j5]).M()-80.1)/100.;
+					double chisqT1 = ((detJets[j1]+detJets[j2]+detJets[j3]).M()-173.)*((detJets[j1]+detJets[j2]+detJets[j3]).M()-173.)/625.;
+					double chisqT2 = ((detJets[j4]+detJets[j5]+detJets[j6]).M()-173.)*((detJets[j4]+detJets[j5]+detJets[j6]).M()-173.)/625.;
+					
+					double chisq_temp = chisqW1 + chisqW2 + chisqT1 + chisqT2;
+					combo_counter++;
+					h_allcombo_chiSq->Fill(chisq_temp);
+					  
+					if(chisq_temp < chisq){
+					  chisq = chisq_temp;
+					  if(chisqW1<chisqW2){
+					    hadW1 = detJets[j1]+detJets[j2];
+					    hadW2 = detJets[j4]+detJets[j5];
+					  }
+					  else{
+					    hadW1 = detJets[j4]+detJets[j5];
+					    hadW2 = detJets[j1]+detJets[j2];
+					  }
+					  if(chisqT1<chisqT1){
+					    Top1 = detJets[j1]+detJets[j2]+detJets[j3];
+					    Top2 = detJets[j4]+detJets[j5]+detJets[j6];
+					  }
+					  else{
+					    Top1 = detJets[j4]+detJets[j5]+detJets[j6];
+					    Top2 = detJets[j1]+detJets[j2]+detJets[j3];
+					  }
+
+					  leftover1 = detJets[i];
+					  leftover2 = detJets[j];
+					  
+					}
+				      }
+				    }
+				  }
+				}
+			      }
+			    }
+			  }
+			}
+		      }
+		    }
+		  }
+		}
 	      }
 	    }
-	  }// end third loop on jets
+	  }
 	}
-      }//end second loop on jets
-   
-      for(; it22!=detJets.end(); ++it22){
-	int jetindex22 = it22 - detJets.begin(); // Get index for current jet
-	if(jetindex22 != W1J1 && jetindex22 != W1J2 ){
+	
+	//cout << "number of combinations = " << combo_counter << endl;
+	h_besthadWmass->Fill(hadW1.M());
+	h_secondbesthadWmass->Fill(hadW2.M());
+	h_besthadWTopmass->Fill(Top1.M());
+	h_secondbesthadWTopmass->Fill(Top2.M());
+	h_TOT_chiSq->Fill(chisq);
+	h_finalJetsmass->Fill((leftover1+leftover2).M());
+	
 
-	  TLorentzVector myDetJet22=*it22;
-	  TLorentzVector JESUpJet22= JESUpJets[jetindex22];
-	  TLorentzVector JESDownJet22= JESDownJets[jetindex22];
+      }
+
+      if(isLinear){
+	double hadW1_chi2 = 9998.;
+	double hadW2_chi2 = 9999.;
+	TLorentzVector hadW1 = 9999.;
+	TLorentzVector hadW2 = 9999.;
+	TLorentzVector hadW1_JESUp = 9999.;
+	TLorentzVector hadW2_JESUp = 9999.;
+	TLorentzVector hadW1_JESDown = 9999.;
+	TLorentzVector hadW2_JESDown = 9999.;
+	
+	int W1J1 = 99.;
+	int W1J2 = 99.;
+	int W2J1 = 99.;
+	int W2J2 = 99.;
+	
+	
+	
+	for(; it2!=detJets.end(); ++it2){
+	  int jetindex2 = it2 - detJets.begin(); // Get index for current jet
 	  
-	  if ((myDetJet22.Pt()>55) || (myDetJet22.Pt()>30 && njets>3)){
-	   	    
-	    for(it32 = it22+1; it32!=detJets.end(); ++it32){
-	      int jetindex32 = it32 - detJets.begin(); // Get index for current jet
-	      if(jetindex32 != W1J1 && jetindex32 != W1J2 ){
+	  TLorentzVector myDetJet2=*it2;
+	  TLorentzVector JESUpJet2= JESUpJets[jetindex2];
+	  TLorentzVector JESDownJet2= JESDownJets[jetindex2];
+	  
+	  if ((myDetJet2.Pt()>55) || (myDetJet2.Pt()>30 && njets>3)){
+	    int nhigher = 0;
+	    for(int jtag=0; jtag<njets && jtag<10;jtag++){
+	      if(myDetBTagDiscr[jetindex2]<myDetBTagDiscr[jtag])
+		nhigher++;
+	    }
+	    btag_order.push_back(nhigher);
 	    
-		TLorentzVector myDetJet32=*it32;
-		TLorentzVector JESUpJet32= JESUpJets[jetindex32];
-		TLorentzVector JESDownJet32= JESDownJets[jetindex32];
+	    for(it3 = it2+1; it3!=detJets.end(); ++it3){
+	      int jetindex3 = it3 - detJets.begin(); // Get index for current jet
+	      
+	      TLorentzVector myDetJet3=*it3;
+	      TLorentzVector JESUpJet3= JESUpJets[jetindex3];
+	      TLorentzVector JESDownJet3= JESDownJets[jetindex3];
+	      
+	      
+	      if ((myDetJet3.Pt()>55) || (myDetJet3.Pt()>30 && njets>3)){
+		
+		if(jetindex2>njets || jetindex3>njets) cout << "TOO MANY JET ITERATIONS" << endl;
+		
+		TLorentzVector hadW1_temp = myDetJet2+myDetJet3;
+		TLorentzVector hadW1_JESUp_temp = JESUpJet2+JESUpJet3;
+		TLorentzVector hadW1_JESDown_temp = JESDownJet2+JESDownJet3;
+		
+		double dijetM_UpDiff = fabs(hadW1_JESUp_temp.M() - hadW1_temp.M());
+		double dijetM_DownDiff = fabs(hadW1_JESDown_temp.M() - hadW1_temp.M());
+		double dijetM_unc = TMath::Max(dijetM_UpDiff,dijetM_DownDiff);
+		
+		double hadW1_chi2_temp = fabs(hadW1_temp.M()-80.1)/dijetM_unc; 
+		
+		//cout << "i = " << jetindex2 << " j = " << jetindex3 << " mass = " <<  dijetM << " chisq = " << chi2_hadW << endl;
 
-		if ((myDetJet32.Pt()>55) || (myDetJet32.Pt()>30 && njets>3)){
-		 		  
-		  if(jetindex22>njets || jetindex32>njets) cout << "TOO MANY JET ITERATIONS" << endl;
-		  
-		  TLorentzVector hadW2_temp = myDetJet22+myDetJet32;
-		  TLorentzVector hadW2_JESUp_temp = JESUpJet22+JESUpJet32;
-		  TLorentzVector hadW2_JESDown_temp = JESDownJet22+JESDownJet32;
-		  
-		  double dijetM_UpDiff = fabs(hadW2_JESUp_temp.M() - hadW2_temp.M());
-		  double dijetM_DownDiff = fabs(hadW2_JESDown_temp.M() - hadW2_temp.M());
-		  double dijetM_unc = TMath::Max(dijetM_UpDiff,dijetM_DownDiff);
-		  
-		  double hadW2_chi2_temp = fabs(hadW2_temp.M()-80.1)/dijetM_unc; 
-		  
-		  //cout << "i = " << jetindex2 << " j = " << jetindex3 << " mass = " <<  dijetM << " chisq = " << chi2_hadW << endl;
-		  
-		  //cout << "dijetM_secondlowestchi2 " << dijetM_secondlowestchi2 << " dijetM_lowestchi2 " << dijetM_lowestchi2 << endl; 	      
-		  //cout << "secondlowestchi2 " << secondlowestchi2 << " lowestchi2 " << lowestchi2 << endl;
-		  
-		  if(hadW2_chi2_temp < hadW2_chi2){
-		    hadW2 = hadW2_temp;
-		    hadW2_JESUp = hadW2_JESUp_temp;
-		    hadW2_JESDown = hadW2_JESDown_temp;
-		    hadW2_chi2 = hadW2_chi2_temp;
-		    W2J1 = jetindex22;
-		    W2J2 = jetindex32;
-		  }
+		//cout << "dijetM_secondlowestchi2 " << dijetM_secondlowestchi2 << " dijetM_lowestchi2 " << dijetM_lowestchi2 << endl; 	      
+		//cout << "secondlowestchi2 " << secondlowestchi2 << " lowestchi2 " << lowestchi2 << endl;
+	      
+		if(hadW1_chi2_temp < hadW1_chi2){
+		  hadW1 = hadW1_temp;
+		  hadW1_JESUp = hadW1_JESUp_temp;
+		  hadW1_JESDown = hadW1_JESDown_temp;
+		  hadW1_chi2 = hadW1_chi2_temp;
+		  W1J1 = jetindex2;
+		  W1J2 = jetindex3;
 		}
 	      }
 	    }// end third loop on jets
 	  }
-	}
-      }//end second loop on jets
+	}//end second loop on jets
    
-      if(W1J1==W2J1 || W1J1==W2J2 || W1J2==W2J1 || W1J2==W2J2 ) WProb_counter++;
+	for(; it22!=detJets.end(); ++it22){
+	  int jetindex22 = it22 - detJets.begin(); // Get index for current jet
+	  if(jetindex22 != W1J1 && jetindex22 != W1J2 ){
 
-
-      h_besthadWmass->Fill(hadW1.M());
-      h_secondbesthadWmass->Fill(hadW2.M());
-
-      //cout << "WINNER: " << dijetM_lowestchi2 << " runner-up: " <<  dijetM_secondlowestchi2 << endl;
-
-      double Top1_chi2 = 9999.0;
-      double Top2_chi2 = 9999.0;
-      TLorentzVector Top1 = 9999.;
-      TLorentzVector Top2 = 9999.;
-      TLorentzVector Top1_JESUp = 9999.;
-      TLorentzVector Top2_JESUp = 9999.;
-      TLorentzVector Top1_JESDown = 9999.;
-      TLorentzVector Top2_JESDown = 9999.;
- 
-      int W1T1 = 99;
-      int W2T2 = 99;
-
-      for(; it4!=detJets.end(); ++it4){
-	int jetindex4 = it4 - detJets.begin(); // Get index for current jet
-	TLorentzVector myDetJet4=*it4;
-	TLorentzVector JESUpJet4= JESUpJets[jetindex4];
-	TLorentzVector JESDownJet4= JESDownJets[jetindex4];
-
-	if ((myDetJet4.Pt()>55) || (myDetJet4.Pt()>30 && njets>3)){
-	  if(jetindex4!=W1J1 && jetindex4!=W1J2 && jetindex4!=W2J1 && jetindex4!=W2J2){
-
-	    TLorentzVector Top1_temp = myDetJet4 + hadW1;
-	    TLorentzVector Top1_JESUp_temp = JESUpJet4 + hadW1_JESUp;
-	    TLorentzVector Top1_JESDown_temp = JESDownJet4 + hadW1_JESDown;
+	    TLorentzVector myDetJet22=*it22;
+	    TLorentzVector JESUpJet22= JESUpJets[jetindex22];
+	    TLorentzVector JESDownJet22= JESDownJets[jetindex22];
+	  
+	    if ((myDetJet22.Pt()>55) || (myDetJet22.Pt()>30 && njets>3)){
+	   	    
+	      for(it32 = it22+1; it32!=detJets.end(); ++it32){
+		int jetindex32 = it32 - detJets.begin(); // Get index for current jet
+		if(jetindex32 != W1J1 && jetindex32 != W1J2 ){
 	    
-	    double topmass_UpDiff = fabs(Top1_JESUp_temp.M() - Top1_temp.M());
-	    double topmass_DownDiff = fabs(Top1_JESDown_temp.M() - Top1_temp.M());
-	    double topmass_unc = TMath::Max(topmass_UpDiff,topmass_DownDiff);
-		  
-	    double Top1_chi2_temp = fabs(Top1_temp.M()-173.1)/topmass_unc; // SB Change me 
+		  TLorentzVector myDetJet32=*it32;
+		  TLorentzVector JESUpJet32= JESUpJets[jetindex32];
+		  TLorentzVector JESDownJet32= JESDownJets[jetindex32];
 
-	    if(Top1_chi2_temp < Top1_chi2){
-	      Top1 = Top1_temp;
-	      Top1_JESUp = Top1_JESUp_temp;
-	      Top1_JESDown = Top1_JESDown_temp;
-	      Top1_chi2 = Top1_chi2_temp;
-	      W1T1 = jetindex4;
+		  if ((myDetJet32.Pt()>55) || (myDetJet32.Pt()>30 && njets>3)){
+		 		  
+		    if(jetindex22>njets || jetindex32>njets) cout << "TOO MANY JET ITERATIONS" << endl;
+		  
+		    TLorentzVector hadW2_temp = myDetJet22+myDetJet32;
+		    TLorentzVector hadW2_JESUp_temp = JESUpJet22+JESUpJet32;
+		    TLorentzVector hadW2_JESDown_temp = JESDownJet22+JESDownJet32;
+		  
+		    double dijetM_UpDiff = fabs(hadW2_JESUp_temp.M() - hadW2_temp.M());
+		    double dijetM_DownDiff = fabs(hadW2_JESDown_temp.M() - hadW2_temp.M());
+		    double dijetM_unc = TMath::Max(dijetM_UpDiff,dijetM_DownDiff);
+		  
+		    double hadW2_chi2_temp = fabs(hadW2_temp.M()-80.1)/dijetM_unc; 
+		  
+		    //cout << "i = " << jetindex2 << " j = " << jetindex3 << " mass = " <<  dijetM << " chisq = " << chi2_hadW << endl;
+		  
+		    //cout << "dijetM_secondlowestchi2 " << dijetM_secondlowestchi2 << " dijetM_lowestchi2 " << dijetM_lowestchi2 << endl; 	      
+		    //cout << "secondlowestchi2 " << secondlowestchi2 << " lowestchi2 " << lowestchi2 << endl;
+		  
+		    if(hadW2_chi2_temp < hadW2_chi2){
+		      hadW2 = hadW2_temp;
+		      hadW2_JESUp = hadW2_JESUp_temp;
+		      hadW2_JESDown = hadW2_JESDown_temp;
+		      hadW2_chi2 = hadW2_chi2_temp;
+		      W2J1 = jetindex22;
+		      W2J2 = jetindex32;
+		    }
+		  }
+		}
+	      }// end third loop on jets
+	    }
+	  }
+	}//end second loop on jets
+   
+	if(W1J1==W2J1 || W1J1==W2J2 || W1J2==W2J1 || W1J2==W2J2 ) WProb_counter++;
+
+
+	h_besthadWmass->Fill(hadW1.M());
+	h_secondbesthadWmass->Fill(hadW2.M());
+
+	//cout << "WINNER: " << dijetM_lowestchi2 << " runner-up: " <<  dijetM_secondlowestchi2 << endl;
+
+	double Top1_chi2 = 9999.0;
+	double Top2_chi2 = 9999.0;
+	TLorentzVector Top1 = 9999.;
+	TLorentzVector Top2 = 9999.;
+	TLorentzVector Top1_JESUp = 9999.;
+	TLorentzVector Top2_JESUp = 9999.;
+	TLorentzVector Top1_JESDown = 9999.;
+	TLorentzVector Top2_JESDown = 9999.;
+ 
+	int W1T1 = 99;
+	int W2T2 = 99;
+
+	for(; it4!=detJets.end(); ++it4){
+	  int jetindex4 = it4 - detJets.begin(); // Get index for current jet
+	  TLorentzVector myDetJet4=*it4;
+	  TLorentzVector JESUpJet4= JESUpJets[jetindex4];
+	  TLorentzVector JESDownJet4= JESDownJets[jetindex4];
+
+	  if ((myDetJet4.Pt()>55) || (myDetJet4.Pt()>30 && njets>3)){
+	    if(jetindex4!=W1J1 && jetindex4!=W1J2 && jetindex4!=W2J1 && jetindex4!=W2J2){
+
+	      TLorentzVector Top1_temp = myDetJet4 + hadW1;
+	      TLorentzVector Top1_JESUp_temp = JESUpJet4 + hadW1_JESUp;
+	      TLorentzVector Top1_JESDown_temp = JESDownJet4 + hadW1_JESDown;
+	    
+	      double topmass_UpDiff = fabs(Top1_JESUp_temp.M() - Top1_temp.M());
+	      double topmass_DownDiff = fabs(Top1_JESDown_temp.M() - Top1_temp.M());
+	      double topmass_unc = TMath::Max(topmass_UpDiff,topmass_DownDiff);
+		  
+	      double Top1_chi2_temp = fabs(Top1_temp.M()-173.1)/topmass_unc; // SB Change me 
+
+	      if(Top1_chi2_temp < Top1_chi2){
+		Top1 = Top1_temp;
+		Top1_JESUp = Top1_JESUp_temp;
+		Top1_JESDown = Top1_JESDown_temp;
+		Top1_chi2 = Top1_chi2_temp;
+		W1T1 = jetindex4;
+	      }
 	    }
 	  }
 	}
-      }
-      for(; it5!=detJets.end(); ++it5){
-	int jetindex5 = it5 - detJets.begin(); // Get index for current jet
-	TLorentzVector myDetJet5=*it5;
-	TLorentzVector JESUpJet5= JESUpJets[jetindex5];
-	TLorentzVector JESDownJet5= JESDownJets[jetindex5];
-	if ((myDetJet5.Pt()>55) || (myDetJet5.Pt()>30 && njets>3)){
-	  if(jetindex5!=W1J1 && jetindex5!=W1J2 && jetindex5!=W2J1 && jetindex5!=W2J2 && jetindex5!=W1T1){
+	for(; it5!=detJets.end(); ++it5){
+	  int jetindex5 = it5 - detJets.begin(); // Get index for current jet
+	  TLorentzVector myDetJet5=*it5;
+	  TLorentzVector JESUpJet5= JESUpJets[jetindex5];
+	  TLorentzVector JESDownJet5= JESDownJets[jetindex5];
+	  if ((myDetJet5.Pt()>55) || (myDetJet5.Pt()>30 && njets>3)){
+	    if(jetindex5!=W1J1 && jetindex5!=W1J2 && jetindex5!=W2J1 && jetindex5!=W2J2 && jetindex5!=W1T1){
 
-	    TLorentzVector Top2_temp = myDetJet5 + hadW2;
-	    TLorentzVector Top2_JESUp_temp = JESUpJet5 + hadW2_JESUp;
-	    TLorentzVector Top2_JESDown_temp = JESDownJet5 + hadW2_JESDown;
+	      TLorentzVector Top2_temp = myDetJet5 + hadW2;
+	      TLorentzVector Top2_JESUp_temp = JESUpJet5 + hadW2_JESUp;
+	      TLorentzVector Top2_JESDown_temp = JESDownJet5 + hadW2_JESDown;
 	    
-	    double topmass_UpDiff = fabs(Top2_JESUp_temp.M() - Top2_temp.M());
-	    double topmass_DownDiff = fabs(Top2_JESDown_temp.M() - Top2_temp.M());
-	    double topmass_unc = TMath::Max(topmass_UpDiff,topmass_DownDiff);
+	      double topmass_UpDiff = fabs(Top2_JESUp_temp.M() - Top2_temp.M());
+	      double topmass_DownDiff = fabs(Top2_JESDown_temp.M() - Top2_temp.M());
+	      double topmass_unc = TMath::Max(topmass_UpDiff,topmass_DownDiff);
 		  
-	    double Top2_chi2_temp = fabs(Top2_temp.M()-173.1)/topmass_unc; // SB Change me 
+	      double Top2_chi2_temp = fabs(Top2_temp.M()-173.1)/topmass_unc; // SB Change me 
 
-	    if(Top2_chi2_temp < Top2_chi2){
-	      Top2 = Top2_temp;
-	      Top2_JESUp = Top2_JESUp_temp;
-	      Top2_JESDown = Top2_JESDown_temp;
-	      Top2_chi2 = Top2_chi2_temp;
-	      W2T2 = jetindex5;
+	      if(Top2_chi2_temp < Top2_chi2){
+		Top2 = Top2_temp;
+		Top2_JESUp = Top2_JESUp_temp;
+		Top2_JESDown = Top2_JESDown_temp;
+		Top2_chi2 = Top2_chi2_temp;
+		W2T2 = jetindex5;
+	      }
 	    }
 	  }
 	}
-      }
-      h_besthadWTopmass->Fill(Top1.M());
-      h_secondbesthadWTopmass->Fill(Top2.M());
+	h_besthadWTopmass->Fill(Top1.M());
+	h_secondbesthadWTopmass->Fill(Top2.M());
 
-      int num_left = 0;
-      TLorentzVector finalJet1 = 9999.;
-      TLorentzVector finalJet2 = 9999.;
-      TLorentzVector finalJets = 9999.;
+	int num_left = 0;
+	TLorentzVector finalJet1 = 9999.;
+	TLorentzVector finalJet2 = 9999.;
+	TLorentzVector finalJets = 9999.;
 
-      for(; it6!=detJets.end(); ++it6){
-	int jetindex6 = it6 - detJets.begin(); // Get index for current jet
-	TLorentzVector myDetJet6=*it6;
+	for(; it6!=detJets.end(); ++it6){
+	  int jetindex6 = it6 - detJets.begin(); // Get index for current jet
+	  TLorentzVector myDetJet6=*it6;
 
-	if(jetindex6!=W1J1 && jetindex6!=W1J2 && jetindex6!=W2J1 && jetindex6!=W2J2 && jetindex6!=W1T1 && jetindex6!=W2T2)num_left++;
-	if(num_left>2) cout << "TOO MANY JETS LEFT AFTER MAKING TOPS" << endl;
+	  if(jetindex6!=W1J1 && jetindex6!=W1J2 && jetindex6!=W2J1 && jetindex6!=W2J2 && jetindex6!=W1T1 && jetindex6!=W2T2)num_left++;
+	  if(num_left>2) cout << "TOO MANY JETS LEFT AFTER MAKING TOPS" << endl;
 
-	if(num_left==1) finalJet1 = myDetJet6;
-	if(num_left==2) finalJet2 = myDetJet6;
-      }
+	  if(num_left==1) finalJet1 = myDetJet6;
+	  if(num_left==2) finalJet2 = myDetJet6;
+	}
 
-      finalJets = finalJet1 + finalJet2;
+	finalJets = finalJet1 + finalJet2;
 
-      if((hadW1_chi2+hadW2_chi2+Top1_chi2+Top2_chi2)<15.){
-	h_finalJetsmass->Fill(finalJets.M());
-      }
-      h_W1_chiSq->Fill(hadW1_chi2);
-      h_W2_chiSq->Fill(hadW2_chi2);
-      h_T1_chiSq->Fill(Top1_chi2);
-      h_T2_chiSq->Fill(Top2_chi2);
-      h_TOT_chiSq->Fill(hadW1_chi2+hadW2_chi2+Top1_chi2+Top2_chi2);
- 
+	if((hadW1_chi2+hadW2_chi2+Top1_chi2+Top2_chi2)<15.){
+	  h_finalJetsmass->Fill(finalJets.M());
+	}
+	h_W1_chiSq->Fill(hadW1_chi2);
+	h_W2_chiSq->Fill(hadW2_chi2);
+	h_T1_chiSq->Fill(Top1_chi2);
+	h_T2_chiSq->Fill(Top2_chi2);
+	h_TOT_chiSq->Fill(hadW1_chi2+hadW2_chi2+Top1_chi2+Top2_chi2);
+      } 
 
     }//end 8j4t selection
 
@@ -556,7 +683,7 @@ void SimpleAnalysis::Loop(TTree *t1){
 
   cout << "number of jets used in W1 AND W2 = " << WProb_counter << endl;
 
-  TFile* outfile = new TFile("histograms_ttH_JESUNC_plustops_JESUNC_dijetM.root","RECREATE");
+  TFile* outfile = new TFile("histograms_ttH_massivefitter_pt25.root","RECREATE");
   h_jets_pt->Write();
   h_njets->Write();
   h_njets_ge6->Write();
@@ -575,6 +702,7 @@ void SimpleAnalysis::Loop(TTree *t1){
   h_T1_chiSq->Write();
   h_T2_chiSq->Write();
   h_TOT_chiSq->Write();
+  h_allcombo_chiSq->Write();
 
 
   h_jet_genID->Write();
