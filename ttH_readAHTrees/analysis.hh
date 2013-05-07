@@ -33,6 +33,25 @@ private:
   // ->>>>
   TH1F*              h_jets_pt;
   TH1F*              h_njets;
+  TH1F*              h_njets_ge6;
+  TH1F*              h_ntags_ge6;
+  TH1F*              h_avecsv_tagged;
+  TH1F*              h_avecsv_untagged;
+  TH1F*              h_avecsv_all;
+
+  TH1F*              h_besthadWmass;
+  TH1F*              h_secondbesthadWmass;
+  TH1F*              h_besthadWTopmass;
+  TH1F*              h_secondbesthadWTopmass;
+  TH1F*              h_finalJetsmass;
+
+  TH1F*              h_W1_chiSq;
+  TH1F*              h_W2_chiSq;
+  TH1F*              h_T1_chiSq;
+  TH1F*              h_T2_chiSq;
+  TH1F*              h_TOT_chiSq;
+
+
   TH1F*              h_jet_genID;
   TH1F*              h_jet_genMotherID;
 
