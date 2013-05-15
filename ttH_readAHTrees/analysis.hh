@@ -38,12 +38,30 @@ private:
   TH1F*              h_avecsv_tagged;
   TH1F*              h_avecsv_untagged;
   TH1F*              h_avecsv_all;
+  TH1F*              h_csv_alljets;
+  TH1F*              h_csv_Hbjets;
+  TH1F*              h_csv_Hbjets_true;
+  TH1F*              h_csv_Tbjets;
+  TH1F*              h_csv_Tbjets_true;
+  TH1F*              h_csv_Wjets;
+  TH1F*              h_csv_Wjets_true;
+  TH1F*              h_csv_Wcjets_true;
+
+  TH1F*              h_Wdecay_true_8j4t;
+  TH1F*              h_Wdecay_true;
 
   TH1F*              h_besthadWmass;
   TH1F*              h_secondbesthadWmass;
   TH1F*              h_besthadWTopmass;
   TH1F*              h_secondbesthadWTopmass;
   TH1F*              h_finalJetsmass;
+  TH1F*              h_finalJetsmass_0Hb;
+  TH1F*              h_finalJetsmass_1Hb;
+  TH1F*              h_finalJetsmass_2Hb;
+
+  TH1F*              h_finalJetsmass_0Hbanywhere;
+  TH1F*              h_finalJetsmass_1Hbanywhere;
+  TH1F*              h_finalJetsmass_2Hbanywhere;
 
   TH1F*              h_W1_chiSq;
   TH1F*              h_W2_chiSq;
@@ -55,6 +73,14 @@ private:
 
   TH1F*              h_jet_genID;
   TH1F*              h_jet_genMotherID;
+
+  TH2F*              h_b_destination;
+  TH1F*              h_singleb_destination;
+  TH2F*              h_higgsdecay;
+  TH1F*              h_higgsdecayb_eta;
+  TH1F*              h_higgsdecayb_dr;
+  TH1F*              h_higgsdecayb_eta_missing;
+  TH1F*              h_higgsdecayb_pt_missing;
 
   // ->>>>
 
