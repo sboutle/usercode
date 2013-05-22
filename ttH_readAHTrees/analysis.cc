@@ -26,8 +26,8 @@ int main()
 
   //TFile *f = new TFile("yggdrasil_treeMaker_v3_mc_TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_Summer12_53xOn52x_mu_sel_1.root");
   //TFile *f = new TFile("yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job1of1.root");
-  TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job*of5.root";
-  //TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTH_Inclusive_M_125_8TeV_53xOn53x_job1of1.root";
+  //TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job*of5.root";
+  TString f1 = "/data2/ttH/allHad_trees/yggdrasil_treeMaker_mc_TTH_Inclusive_M_125_8TeV_53xOn53x_job1of1.root";
   //TString f1 = "/data2/ttH/allHad_trees/trees_25GeV/yggdrasil_treeMaker_mc_TTJets_HadronicMGDecays_8TeV-madgraph_Summer12_53xOn53x_job*of5.root";
 
   //TString f1 = "/data2/ttH/allHad_trees/trees_25GeV/yggdrasil_treeMaker_mc_TTH_Inclusive_M_125_8TeV_53xOn53x_job1of1.root";
@@ -77,15 +77,28 @@ void SimpleAnalysis::Loop(TTree *t1){
   h_secondbesthadWTopmass = new TH1F("Second Best had W Top mass", "Second best had W Top mass", 400, 0.0, 400.0);
 
   h_finalJetsmass = new TH1F("Mass of remaining 2 jets", "Mass of remaining 2 jets", 400, 0.0, 400.0);
+  h_finalJetsmass_1Hb99 = new TH1F("Mass of remaining 2 jets for ==1 matched to b (including -99 jets)", "Mass of remaining 2 jets for ==1 matched to b (including -99 jets)", 400, 0.0, 400.0);
+  h_finalJetsmass_2Hb99 = new TH1F("Mass of remaining 2 jets for ==2 matched to b (including -99 jets)", "Mass of remaining 2 jets for ==2 matched to b (including -99 jets)", 400, 0.0, 400.0);
+  h_finalJetsmass_0Hb99 = new TH1F("Mass of remaining 2 jets for ==0 matched to b (including -99 jets)", "Mass of remaining 2 jets for ==0 matched to b (including -99 jets)", 400, 0.0, 400.0);
+
   h_finalJetsmass_1Hb = new TH1F("Mass of remaining 2 jets for ==1 matched to b", "Mass of remaining 2 jets for ==1 matched to b", 400, 0.0, 400.0);
   h_finalJetsmass_2Hb = new TH1F("Mass of remaining 2 jets for ==2 matched to b", "Mass of remaining 2 jets for ==2 matched to b", 400, 0.0, 400.0);
   h_finalJetsmass_0Hb = new TH1F("Mass of remaining 2 jets for ==0 matched to b", "Mass of remaining 2 jets for ==0 matched to b", 400, 0.0, 400.0);
 
+  h_finalJetsmass_2Hb99_nomerge = new TH1F("Mass of remaining 2 jets for ==2 matched to b (including -99 jets) with merge removal", "Mass of remaining 2 jets for ==2 matched to b (including -99 jets) with merge removal", 400, 0.0, 400.0);
+  h_finalJetsmass_2H_nomerge = new TH1F("Mass of remaining 2 jets for ==2 matched to b with merge removal", "Mass of remaining 2 jets for ==2 matched to b with merge removal", 400, 0.0, 400.0);
+
+  h_HbtoOther_dr_all = new TH1F("DeltaR(Higgs b, other) for all 8j4t", "DeltaR(Higgs b, other) for all 8j4t", 48, 0.0, 6.0);
+  h_HbtoOther_dr_2Hb99 = new TH1F("DeltaR(Higgs b, other) for events with 2 correctly chosen b's (including -99 jets)", "DeltaR(Higgs b, other) for events with 2 correctly chosen b's (including -99 jets)", 48, 0.0, 6.0);
+  h_HbtoOther_dr_2Hb = new TH1F("DeltaR(Higgs b, other) for events with 2 correctly chosen b's", "DeltaR(Higgs b, other) for events with 2 correctly chosen b's", 48, 0.0, 6.0);
 
   h_finalJetsmass_0Hbanywhere = new TH1F("Mass of remaining 2 jets for ==0 bs from Higgs in the event", "Mass of remaining 2 jets for ==0 bs from Higgs in the event", 400, 0.0, 400.0);
   h_finalJetsmass_1Hbanywhere = new TH1F("Mass of remaining 2 jets for ==1 bs from Higgs in the event", "Mass of remaining 2 jets for ==1 bs from Higgs in the event", 400, 0.0, 400.0);
 
   h_finalJetsmass_2Hbanywhere = new TH1F("Mass of remaining 2 jets for ==2 bs from Higgs in the event", "Mass of remaining 2 jets for ==2 bs from Higgs in the event", 400, 0.0, 400.0);
+
+  h_finalJetsmass_2Hbanywhere_allevents = new TH1F("Mass of b-associated jets for ==2 bs from Higgs in the event", "Mass of b-associated jets for ==2 bs from Higgs in the event", 400, 0.0, 400.0);
+  h_finalJetsmass_2Hbanywhere_allevents_nomerge = new TH1F("Mass of b-associated jets for ==2 bs from Higgs in the event with merge removal", "Mass of b-associated jets for ==2 bs from Higgs in the event with merge removal", 400, 0.0, 400.0);
 
   h_b_destination = new TH2F("Destination of the Higgs b", "Destination of the Higgs b", 4, 0.5, 4.5, 4, 0.5, 4.5);
   h_singleb_destination = new TH1F("Destination of the single Higgs b", "Destination of the single Higgs b", 4, 0.5, 4.5);
@@ -458,7 +471,7 @@ void SimpleAnalysis::Loop(TTree *t1){
 					
 					  double chisq_temp = chisqW1 + chisqW2 + chisqT1 + chisqT2;
 					  h_allcombo_chiSq->Fill(chisq_temp);
-					  if(myDetBTagDiscr[j1]<0.95 && myDetBTagDiscr[j2]<0.95 && myDetBTagDiscr[j4]<0.95 && myDetBTagDiscr[j5]<0.95 && myDetBTagDiscr[j3]>0.679 && myDetBTagDiscr[j4]>0.679){
+					  //if(myDetBTagDiscr[j1]<0.95 && myDetBTagDiscr[j2]<0.95 && myDetBTagDiscr[j4]<0.95 && myDetBTagDiscr[j5]<0.95 && myDetBTagDiscr[j3]>0.679 && myDetBTagDiscr[j4]>0.679){
 					  //if(myDetBTagDiscr[j3]>0.679 && myDetBTagDiscr[j6]>0.679){
 					    if(chisq_temp < chisq ){
 					      chisq = chisq_temp;
@@ -495,7 +508,7 @@ void SimpleAnalysis::Loop(TTree *t1){
 					      chosen_jet1 = i;
 					      chosen_jet2 = j;
 					    }
-					  }
+					    //}
 					}
 				      }
 				    }
@@ -652,23 +665,89 @@ void SimpleAnalysis::Loop(TTree *t1){
 	  if(higgsdecayproducts[0]==0 &&higgsdecayproducts[1]==0){
 	    h_finalJetsmass->Fill((leftover1+leftover2).M());
 	    if(jet_motherID[chosen_jet1]!=25 && jet_motherID[chosen_jet1]!=-99 && jet_motherID[chosen_jet2]!=25 && jet_motherID[chosen_jet2]!=-99){
-	      //if(jet_motherID[chosen_jet1]!=25 && jet_motherID[chosen_jet2]!=25){
-	      h_finalJetsmass_0Hb->Fill((leftover1+leftover2).M());
+	      h_finalJetsmass_0Hb99->Fill((leftover1+leftover2).M());
 	    }
 	    if((jet_motherID[chosen_jet1]==25 || jet_motherID[chosen_jet1]==-99) ^ (jet_motherID[chosen_jet2]==25 || jet_motherID[chosen_jet2]==-99)){
-	      //if(jet_motherID[chosen_jet1]==25 ^ jet_motherID[chosen_jet2]==25){
-	      h_finalJetsmass_1Hb->Fill((leftover1+leftover2).M());
+	      h_finalJetsmass_1Hb99->Fill((leftover1+leftover2).M());
 	      if(jet_motherID[W_jet_11]==25 || jet_motherID[W_jet_12]==25 ) h_singleb_destination->Fill(1);
 	      if(jet_motherID[W_jet_21]==25 || jet_motherID[W_jet_22]==25 ) h_singleb_destination->Fill(2);
 	      if(jet_motherID[T_jet_1]==25) h_singleb_destination->Fill(3);
 	      if(jet_motherID[T_jet_2]==25) h_singleb_destination->Fill(4);
 	    }
 	    if((jet_motherID[chosen_jet1]==25 || jet_motherID[chosen_jet1]==-99) && (jet_motherID[chosen_jet2]==25 || jet_motherID[chosen_jet2]==-99)){
-	      //if(jet_motherID[chosen_jet1]==25 && jet_motherID[chosen_jet2]==25){
-	      h_finalJetsmass_2Hb->Fill((leftover1+leftover2).M());
+	      h_finalJetsmass_2Hb99->Fill((leftover1+leftover2).M());
+	    }
+
+	    if(jet_motherID[chosen_jet1]!=25 && jet_motherID[chosen_jet2]!=25) h_finalJetsmass_0Hb->Fill((leftover1+leftover2).M());
+	    if(jet_motherID[chosen_jet1]==25 ^ jet_motherID[chosen_jet2]==25) h_finalJetsmass_1Hb->Fill((leftover1+leftover2).M());
+	    if(jet_motherID[chosen_jet1]==25 && jet_motherID[chosen_jet2]==25) h_finalJetsmass_2Hb->Fill((leftover1+leftover2).M());
+	    
+	    
+	    vector<TLorentzVector> myHbparticles;
+	    myHbparticles.clear();
+	    vector<TLorentzVector> myOtherparticles;
+	    myOtherparticles.clear();
+
+	    //cout << "EVENT =======================================================" << endl;
+
+	    vector<TLorentzVector>::iterator mcit2 = mcParticles.begin();    
+	    for(; mcit2!=mcParticles.end(); ++mcit2){
+	      int mcindex = mcit2 - mcParticles.begin(); // Get index
+	      TLorentzVector myMCparticle=*mcit2; 
+	      int myMCparticleID = mcTrueID[mcindex];
+	      int myMCparticleINDEX = mcTrueINDEX[mcindex];
+	      //cout << "index: " << myMCparticleINDEX << " ID: " << myMCparticleID << " PT: " << myMCparticle.Pt() << endl;
+	      for(int i=0; i<mcTrueINDEX.size();i++){
+		if(mcTrueINDEX[i]==mcTrueMOTHER[mcindex]){
+		  TLorentzVector myMCparticleMother=mcParticles[i];
+		  //cout << "Mother index: " << mcTrueINDEX[i] << " MOTHER ID: " << mcTrueID[i] << " MOTHER PT: " << myMCparticleMother.Pt() << endl;
+		  if(fabs(mcTrueID[i]) == 25) myHbparticles.push_back(myMCparticle);
+		  if(fabs(mcTrueID[i]) == 24) myOtherparticles.push_back(myMCparticle);
+		  if(fabs(mcTrueID[i]) == 6 && fabs(myMCparticleID)==5) myOtherparticles.push_back(myMCparticle);
+		}
+	      } 
 	    }
 	    
+
+	    vector<TLorentzVector>::iterator mcHbit = myHbparticles.begin();    
+	    vector<TLorentzVector>::iterator mcOtherit = myOtherparticles.begin();    
+
+	    //if((jet_motherID[chosen_jet1]==25 || jet_motherID[chosen_jet1]==-99) && (jet_motherID[chosen_jet2]==25 || jet_motherID[chosen_jet2]==-99)) cout << "n b's " << myHbparticles.size() << " n others " << myOtherparticles.size() << endl;
 	    
+	    bool reject_formerge = false;
+	    bool reject_formerge_99 = false;
+
+	    for(; mcHbit!=myHbparticles.end(); ++mcHbit){
+	      int mcindexHb = mcHbit - myHbparticles.begin(); // Get index
+
+	      //cout << "Higg's b: " << mcindexHb << endl;
+
+	      TLorentzVector myHbparticle_temp=*mcHbit; 
+	      //for(; mcOtherit!=myOtherparticles.end(); ++mcOtherit){
+	      //int mcindexOther = mcOtherit - myOtherparticles.begin(); // Get index
+	      for(int mcindexOther=0; mcindexOther<myOtherparticles.size(); mcindexOther++){
+		TLorentzVector myOtherparticle_temp= myOtherparticles[mcindexOther]; 
+		h_HbtoOther_dr_all->Fill(myHbparticle_temp.DeltaR(myOtherparticle_temp));
+		if((jet_motherID[chosen_jet1]==25 || jet_motherID[chosen_jet1]==-99) && (jet_motherID[chosen_jet2]==25 || jet_motherID[chosen_jet2]==-99)){
+		  h_HbtoOther_dr_2Hb99->Fill(myHbparticle_temp.DeltaR(myOtherparticle_temp));
+		  //cout << "Higg's b: " << mcindexHb << " other: " <<  mcindexOther << endl;
+		  if(myHbparticle_temp.DeltaR(myOtherparticle_temp)<1.0) reject_formerge_99=true;
+		}
+		if(jet_motherID[chosen_jet1]==25 && jet_motherID[chosen_jet2]==25){
+		  h_HbtoOther_dr_2Hb->Fill(myHbparticle_temp.DeltaR(myOtherparticle_temp));
+		  //cout << "Higg's b: " << mcindexHb << " other: " <<  mcindexOther << endl;
+		  if(myHbparticle_temp.DeltaR(myOtherparticle_temp)<1.0) reject_formerge=true;
+		}
+	      }
+	    }
+
+	    if((jet_motherID[chosen_jet1]==25 || jet_motherID[chosen_jet1]==-99) && (jet_motherID[chosen_jet2]==25 || jet_motherID[chosen_jet2]==-99)){
+	      if(reject_formerge_99==false) h_finalJetsmass_2Hb99_nomerge->Fill((leftover1+leftover2).M());
+	    }
+	    if(jet_motherID[chosen_jet1]==25 && jet_motherID[chosen_jet2]==25){
+	      if(reject_formerge==false) h_finalJetsmass_2Hb_nomerge->Fill((leftover1+leftover2).M());
+	    }
+
 	    if(jet_motherID[W_jet_11]==25 && jet_motherID[W_jet_12]==25) h_b_destination->Fill(1,1);
 	    
 	    if(jet_motherID[W_jet_11]==25 && jet_motherID[W_jet_21]==25) h_b_destination->Fill(1,2);
@@ -737,8 +816,23 @@ void SimpleAnalysis::Loop(TTree *t1){
 	    cout << endl;
 	    */
 	    }
+	    TLorentzVector vHb1 = 9999.;
+	    TLorentzVector vHb2 = 9999.;
+	    
+
 	    if(Hbcounter==2){
 	      h_finalJetsmass_2Hbanywhere->Fill((leftover1+leftover2).M());
+	      int counter_Hb = 0;
+	      for(int ijet = 0; ijet<njets; ijet++){
+		if(jet_motherID[ijet]==25){
+		  if(counter_Hb==1){ vHb2 = detJets[ijet]; counter_Hb++; }
+		  if(counter_Hb==0){ vHb1 = detJets[ijet]; counter_Hb++; }
+		}
+	      }
+	      h_finalJetsmass_2Hbanywhere_allevents->Fill((vHb1+vHb2).M());
+	      if(reject_formerge==false) h_finalJetsmass_2Hbanywhere_allevents_nomerge->Fill((vHb1+vHb2).M());
+
+
 	    }
 	  }
 	  
@@ -1026,7 +1120,7 @@ void SimpleAnalysis::Loop(TTree *t1){
 
   cout << "number of jets used in W1 AND W2 = " << WProb_counter << endl;
 
-  TFile* outfile = new TFile("histograms_ttJets_massivefitter_8j4t_oldfile_tagVetoW_tagTopB.root","RECREATE");
+  TFile* outfile = new TFile("histograms_ttH_massivefitter_8j4t_oldfile_2.root","RECREATE");
   //TFile* outfile = new TFile("histograms_ttH_massivefitter_8j4t_oldfile.root","RECREATE");
   h_jets_pt->Write();
   h_njets->Write();
@@ -1052,6 +1146,17 @@ void SimpleAnalysis::Loop(TTree *t1){
   h_finalJetsmass_0Hbanywhere->Write();
   h_finalJetsmass_1Hbanywhere->Write();
   h_finalJetsmass_2Hbanywhere->Write();
+  h_finalJetsmass_2Hbanywhere_allevents->Write();
+  h_finalJetsmass_2Hbanywhere_allevents_nomerge->Write();
+  h_finalJetsmass_0Hb99->Write();
+  h_finalJetsmass_1Hb99->Write();
+  h_finalJetsmass_2Hb99->Write();
+  h_finalJetsmass_2Hb99_nomerge->Write();
+  h_finalJetsmass_2Hb_nomerge->Write();
+  h_HbtoOther_dr_2Hb99->Write();
+  h_HbtoOther_dr_2Hb->Write();
+  h_HbtoOther_dr_all->Write();
+
   h_finalJetsmass_0Hb->Write();
   h_finalJetsmass_1Hb->Write();
   h_finalJetsmass_2Hb->Write();

@@ -58,10 +58,21 @@ private:
   TH1F*              h_finalJetsmass_0Hb;
   TH1F*              h_finalJetsmass_1Hb;
   TH1F*              h_finalJetsmass_2Hb;
+  TH1F*              h_finalJetsmass_0Hb99;
+  TH1F*              h_finalJetsmass_1Hb99;
+  TH1F*              h_finalJetsmass_2Hb99;
+  TH1F*              h_finalJetsmass_2Hb99_nomerge;
+  TH1F*              h_finalJetsmass_2Hb_nomerge;
+
+  TH1F*              h_HbtoOther_dr_all;
+  TH1F*              h_HbtoOther_dr_2Hb99;
+  TH1F*              h_HbtoOther_dr_2Hb;
 
   TH1F*              h_finalJetsmass_0Hbanywhere;
   TH1F*              h_finalJetsmass_1Hbanywhere;
   TH1F*              h_finalJetsmass_2Hbanywhere;
+  TH1F*              h_finalJetsmass_2Hbanywhere_allevents;
+  TH1F*              h_finalJetsmass_2Hbanywhere_allevents_nomerge;
 
   TH1F*              h_W1_chiSq;
   TH1F*              h_W2_chiSq;
